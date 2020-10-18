@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
+import { Product } from './products.model';
 
 import { ProductsService } from './products.service';
 
@@ -15,41 +16,42 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  addProduct(
-    @Body('title') prodTitle: string,
-    @Body('description') prodDesc: string,
-    @Body('price') prodPrice: number,
-  ): any {
-    const generatedId = this.productsService.inserProduct(
-      prodTitle,
-      prodDesc,
-      prodPrice,
+  async addProduct(
+    @Body('title') title: string,
+    @Body('description') description: string,
+    @Body('price') price: number,
+  ) {
+    const generatedId = await this.productsService.inserProduct(
+      title,
+      description,
+      price,
     );
     return { id: generatedId };
   }
 
   @Get()
-  getAllProducts() {
-    return { products: this.productsService.getProducts() };
+  async getAllProducts() {
+    const products: Product[] = await this.productsService.getProducts();
+    return { products };
   }
 
   @Get(':id')
-  getProduct(@Param('id') prodId: string) {
+  async getProduct(@Param('id') prodId: string) {
     return this.productsService.getSingleProduct(prodId);
   }
 
   @Patch(':id')
-  updateProduct(
-    @Param('id') prodId: string,
-    @Body('title') prodTitle: string,
-    @Body('description') prodDesc: string,
-    @Body('price') prodPrice: number,
+  async updateProduct(
+    @Param('id') id: string,
+    @Body('title') title: string,
+    @Body('description') description: string,
+    @Body('price') price: number,
   ) {
-    this.productsService.updateProduct(prodId, prodTitle, prodDesc, prodPrice);
+    await this.productsService.updateProduct(id, title, description, price);
   }
 
   @Delete(':id')
-  removeProduct(@Param('id') prodId: string) {
-    this.productsService.deleteProduct(prodId);
+  async removeProduct(@Param('id') id: string) {
+    await this.productsService.deleteProduct(id);
   }
 }
